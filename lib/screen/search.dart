@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:level4/sheard/colors.dart';
 class search extends StatefulWidget {
   const search({super.key});
 
@@ -10,8 +11,15 @@ class _searchState extends State<search> {
   @override
   Widget build(BuildContext context) {
     return  Scaffold(
+        backgroundColor: mobileBackgroundColor,
       appBar: AppBar(
-        title: Text("search"),
+        backgroundColor: mobileBackgroundColor,
+        title: TextFormField(
+          decoration: InputDecoration(
+            hintText: "Search for a user ...",
+            border: InputBorder.none
+          ),
+        )
       ),
     );
   }

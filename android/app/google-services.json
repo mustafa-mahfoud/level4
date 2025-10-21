@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "89991785385",
+    "project_id": "instgram-181b5",
+    "storage_bucket": "instgram-181b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:89991785385:android:fe4d9d4532f05b3bebb2b8",
+        "android_client_info": {
+          "package_name": "com.example.level4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw3RshDjJ79tIhmpw2x05-oUTFHauVzyc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

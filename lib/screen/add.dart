@@ -1,3 +1,6 @@
+
+//شو بيعمل هاد الكلاس
+
 import 'package:flutter/material.dart';
 class add extends StatefulWidget {
   const add({super.key});
@@ -12,7 +15,14 @@ class _addState extends State<add> {
     return  Scaffold(
       appBar: AppBar(
         title: Text("add"),
+        
       ),
+      body: Center (child: IconButton(onPressed: (){}, icon: Icon(Icons.upload,size: 70,))
+      ),
+    
+      
+
+
     );
   }
 }
