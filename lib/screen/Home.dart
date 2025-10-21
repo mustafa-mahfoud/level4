@@ -1,6 +1,8 @@
 // ignore_for_file: sized_box_for_whitespace
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:level4/screen/signin.dart';
 
 import 'package:level4/sheard/colors.dart';
 
@@ -33,7 +35,39 @@ class _HomeState extends State<Home> {
                   icon: Icon(Icons.messenger_outline, color: Colors.white),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(11) ),
+                                  child: Container(
+                                    padding: EdgeInsets.all(22),
+                                    height: 200,
+                                    child: Column(
+                                      children: [
+                                        const Text("Do Toy Logout?",style:TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
+                                        SizedBox(height: 20),
+                                        ElevatedButton(
+                        onPressed: ()async{
+                                                      await  FirebaseAuth.instance.signOut();
+                                              Navigator.of(context).pushReplacement(
+                                       MaterialPageRoute(builder: (context) => const Signin()),
+                        );
+   },
+   style: ButtonStyle(
+     backgroundColor: MaterialStateProperty.all(Colors.white),
+     padding: MaterialStateProperty.all(EdgeInsets.all(12)),
+     shape: MaterialStateProperty.all(RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+  ),
+   child: const Text("Logout", style: TextStyle(fontSize: 19,color: Colors.red),),
+),
+                                      ],
+                                    ),
+                                  ),
+                              );
+                            });
+                  },
                   icon: Icon(Icons.logout, color: Colors.white),
                 ),
               ],

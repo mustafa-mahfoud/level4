@@ -1,14 +1,22 @@
 import 'dart:io';
-import 'dart:math' show Random;
+import 'dart:math' show Random, e;
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:level4/responsef/mobile.dart';
+import 'package:level4/responsef/responsef.dart';
+import 'package:level4/responsef/web.dart';
+import 'package:level4/Firbase_Servics/Auth.dart';
+
+import 'package:level4/Firbase_Servics/image_packer.dart';
+import 'package:level4/screen/Home.dart';
 import 'package:level4/screen/signin.dart';
 import 'package:level4/sheard/MyTextfalid.dart';
 import 'package:level4/sheard/SnackBar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' show basename;
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -23,6 +31,8 @@ class _SignupState extends State<Signup> {
   bool hasUppercase = false;
   bool hasLowercase = false;
   bool hasSpecialCharacters = false;
+
+  // String? imgName;
 
   ischngedPassweord(String emil) {
     if (emil.contains(RegExp(r'.{8,}'))) {
@@ -52,46 +62,8 @@ class _SignupState extends State<Signup> {
     }
   }
 
-  signup() async {
-    setState(() {
-      valu = false;
-    });
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: emailController.text,
-            password: passwordController.text,
-          );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        showSnackBar(context, 'The password provided is too weak.');
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        showSnackBar(context, "The account already exists for that email.");
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
-  uploadImage2Screen(ImageSource source) async {
- Navigator.pop(context);
- final XFile? pickedImg = await ImagePicker().pickImage(source: source);
-  try {
-      if (pickedImg != null) {
-      imgPath = await pickedImg.readAsBytes();
-      setState(() {
-      imgName = basename(pickedImg.path);
-      int random = Random().nextInt(0000 );
-      imgName = "$random$imgName";
-      print(imgName);
-   });
- } else {
-   print("NO img selected");
-   }
- } catch (e) {
-  print("Error => $e");
-   }}
+  // ...existing code...
+
   bool visibility = true;
   final _formKey = GlobalKey<FormState>();
   bool valu = true;
@@ -100,8 +72,7 @@ class _SignupState extends State<Signup> {
   final nameController = TextEditingController();
   final ageController = TextEditingController();
   final titleController = TextEditingController();
-  Uint8List? imgPath;
-  String? imgName;
+  final imagePacker = ImagePacker();
 
   @override
   void dispose() {
@@ -136,17 +107,19 @@ class _SignupState extends State<Signup> {
                         onTap: () async {
                           //await uploadImage();
                         },
-                        child: imgPath == null
+                        child: imagePacker.imgPath == null
                             ? const CircleAvatar(
                                 radius: 70,
                                 backgroundImage: AssetImage(
                                   "assets/image/Profile_avatar_placeholder_large.png",
                                 ),
                               )
-                            :CircleAvatar(
-                             radius: 71,
-                          backgroundImage: MemoryImage(imgPath!),
-                            ),
+                            : CircleAvatar(
+                                radius: 70,
+                                backgroundImage: MemoryImage(
+                                  imagePacker.imgPath!,
+                                ),
+                              ),
                       ),
                       Positioned(
                         bottom: widthScreen > 600 ? -12 : -15,
@@ -171,11 +144,12 @@ class _SignupState extends State<Signup> {
                                       children: [
                                         IconButton(
                                           onPressed: () async {
-                                          Navigator.pop(context);
+                                            Navigator.pop(context);
 
-                                            await uploadImage2Screen(
-                                                ImageSource.camera);
-                                            
+                                            await imagePacker.uploadImage(
+                                              ImageSource.camera,
+                                            );
+                                            setState(() {});
                                           },
                                           icon: const Icon(
                                             Icons.camera_alt,
@@ -186,9 +160,10 @@ class _SignupState extends State<Signup> {
                                         IconButton(
                                           onPressed: () async {
                                             Navigator.pop(context);
-                                            await uploadImage2Screen(
-                                                ImageSource.gallery);
-                                            
+                                            await imagePacker.uploadImage(
+                                              ImageSource.gallery,
+                                            );
+                                            setState(() {});
                                           },
                                           icon: const Icon(
                                             Icons.abc,
@@ -219,7 +194,12 @@ class _SignupState extends State<Signup> {
                         MyTextfalid(
                           suffixIcon: const Icon(Icons.person),
                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          validator: (valu) {},
+                        validator: (value) {
+                         if (value == null || value.trim().isEmpty) {
+                           return "Username cannot be empty";
+                          }                          
+                  return null;
+             },
                           onChanged: (username) {},
                           //   return value != null && !EmailValidator.validate(value)
                           //       ? "Enter a valid email"
@@ -270,7 +250,7 @@ class _SignupState extends State<Signup> {
                           controller: emailController,
                           keyboardType: TextInputType.emailAddress,
                           obscureText: false,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
                           validator: (value) {
                             return value!.contains(
                                   RegExp(
@@ -449,14 +429,25 @@ class _SignupState extends State<Signup> {
                   ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        await signup();
+                        setState(() {
+                          valu = false;
+                        });
+                        await Auth().signup(
+                          emailll: emailController.text,
+                          passworddd: passwordController.text,
+                          context: context,
+                          full_name111: nameController.text,
+                          age111: ageController.text,
+                          title111: titleController.text, folloers: [], folloing: [],
+                        );
+                        setState(() {
+                          valu = true;
+                        });
+                    
                       } else {
                         print("=============================");
                         showSnackBar(context, "Error");
                       }
-                      setState(() {
-                        valu = true;
-                      });
                     },
                     style: ButtonStyle(
                       backgroundColor: WidgetStateProperty.all(
